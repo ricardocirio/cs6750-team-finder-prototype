@@ -1,10 +1,11 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
-import { motion, useAnimation, HTMLMotionProps } from 'framer-motion';
+import { motion, useAnimation } from 'framer-motion';
 import { useDrag } from '@use-gesture/react';
-import type { Handler } from '@use-gesture/core/types';
-
 import { Student } from '../types';
+
+type DragBindResult = ReturnType<typeof useDrag>;
+type DragBindFunction = DragBindResult extends (args: any) => infer R ? R : never;
 
 interface SwipeableCardProps {
   student: Student;

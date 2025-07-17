@@ -121,9 +121,9 @@ export default function CardDeck() {
             {showSkillPrompt && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                 <div className="bg-white p-6 rounded-lg max-w-sm">
-                  <h3 className="text-xl font-semibold mb-4">Still searching?</h3>
-                  <p className="mb-4">Which skill matters most right now?</p>
-                  <div className="space-y-2">
+                  <h3 className="text-xl text-gray-600">Still searching?</h3>
+                  <p className="text-gray-600">Which skill matters most right now?</p>
+                  <div className="text-gray-600 space-y-2">
                     {['UI/UX Design', 'Backend Development', 'Project Management'].map((skill) => (
                       <button
                         key={skill}
