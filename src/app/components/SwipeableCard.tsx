@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import { motion, useAnimation, HTMLMotionProps } from 'framer-motion';
 import { useDrag } from '@use-gesture/react';
+import type { Handler } from '@use-gesture/core/types';
 
 import { Student } from '../types';
 
@@ -75,10 +76,31 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
     }
   }, [isActive, controls]);
 
+  const ref = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    const el = ref.current;
+    if (el) {
+      const bindFn = bind();
+      Object.entries(bindFn).forEach(([key, value]) => {
+        if (typeof value === 'function') {
+          el.addEventListener(key.slice(2).toLowerCase(), value as any);
+        }
+      });
+      
+      return () => {
+        Object.entries(bindFn).forEach(([key, value]) => {
+          if (typeof value === 'function') {
+            el.removeEventListener(key.slice(2).toLowerCase(), value as any);
+          }
+        });
+      };
+    }
+  }, [bind]);
+
   return (
     <motion.div
-      // @ts-expect-error - use-gesture and framer-motion type mismatch
-      {...bind()}
+      ref={ref}
       animate={controls}
       initial={{ scale: 1 }}
       exit={{
@@ -87,8 +109,7 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
         opacity: 0,
         transition: { duration: 0.2 }
       }}
-      drag={false} // Disable framer-motion's built-in drag
-      className="absolute w-[300px] h-[400px] bg-white rounded-2xl shadow-xl p-6 cursor-grab active:cursor-grabbing touch-none"
+      className="absolute w-[300px] h-[400px] bg-white rounded-2xl shadow-xl p-6 cursor-grab active:cursor-grabbing touch-none mt-32"
       style={{
         touchAction: 'none',
         WebkitTouchCallout: 'none',
