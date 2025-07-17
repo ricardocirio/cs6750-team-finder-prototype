@@ -19,8 +19,19 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
   const [isDragging, setIsDragging] = useState(false);
 
   const bind = useDrag(
-    ({ movement: [x, y], last }) => {
-      const shouldSwipe = Math.abs(x) > 100 || Math.abs(y) > 100;
+    ({ movement: [x, y], last, distance: [dx, dy], velocity: [vx, vy] }) => {
+      // Update position while dragging
+      if (!last) {
+        controls.start({
+          x,
+          y,
+          rotateZ: x * 0.1, // Add a little rotation while dragging
+          transition: { duration: 0 }
+        });
+      }
+
+      // Check if we should trigger a swipe
+      const shouldSwipe = Math.abs(x) > 100 || Math.abs(y) > 100 || Math.abs(dx) > 100 || Math.abs(dy) > 100 || Math.abs(vx) > 0.5 || Math.abs(vy) > 0.5;
 
       if (!isDragging && last && shouldSwipe) {
         setIsDragging(true);
@@ -35,7 +46,8 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
         setExitX(x);
         setExitY(y);
         onSwipe(direction as 'left' | 'right' | 'up' | 'down', student);
-      } else if (!last) {
+      } else if (last) {
+        // Reset position if not swiped
         controls.start({
           x: 0,
           y: 0,
@@ -44,7 +56,12 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
         });
       }
     },
-    { enabled: isActive }
+    {
+      enabled: isActive,
+      preventScroll: true,
+      filterTaps: true,
+      threshold: 5 // Small threshold to prevent accidental swipes
+    }
   );
 
   useEffect(() => {
@@ -70,11 +87,14 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
       className="absolute w-[300px] h-[400px] bg-white rounded-2xl shadow-xl p-6 cursor-grab active:cursor-grabbing touch-none"
       style={{ 
         touchAction: 'none',
+        WebkitTouchCallout: 'none',
+        WebkitUserSelect: 'none',
+        userSelect: 'none',
         zIndex: isActive ? 10 : 0,
         transform: isActive ? 'scale(1)' : 'scale(0.95) translateY(10px)',
         opacity: isActive ? 1 : 0.8,
         pointerEvents: isActive ? 'auto' : 'none'
-      }}
+      } as any}
     >
       <div className="flex flex-col h-full">
         <div className="text-2xl font-bold text-gray-900 mb-2">{student.name}</div>
