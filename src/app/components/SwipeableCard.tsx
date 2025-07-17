@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { motion, useAnimation, HTMLMotionProps } from 'framer-motion';
+import { useEffect, useState, useRef } from 'react';
+import { motion, useAnimation } from 'framer-motion';
 import { useDrag } from '@use-gesture/react';
 
 import { Student } from '../types';
@@ -56,13 +56,9 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
   }, [isActive, controls]);
 
   return (
+    // @ts-expect-error - use-gesture and framer-motion type mismatch
     <motion.div
-      onTouchStart={bind().onTouchStart}
-      onTouchMove={bind().onTouchMove}
-      onTouchEnd={bind().onTouchEnd}
-      onMouseDown={bind().onMouseDown}
-      onMouseMove={bind().onMouseMove}
-      onMouseUp={bind().onMouseUp}
+      {...bind()}
       animate={controls}
       initial={{ scale: 1 }}
       exit={{
