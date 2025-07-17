@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import { motion, useAnimation, HTMLMotionProps } from 'framer-motion';
 import { useDrag } from '@use-gesture/react';
 
 import { Student } from '../types';
@@ -55,11 +55,14 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
     }
   }, [isActive, controls]);
 
-  const bindProps = bind();
-
   return (
     <motion.div
-      {...(bind() as any)}
+      onTouchStart={bind().onTouchStart}
+      onTouchMove={bind().onTouchMove}
+      onTouchEnd={bind().onTouchEnd}
+      onMouseDown={bind().onMouseDown}
+      onMouseMove={bind().onMouseMove}
+      onMouseUp={bind().onMouseUp}
       animate={controls}
       initial={{ scale: 1 }}
       exit={{
