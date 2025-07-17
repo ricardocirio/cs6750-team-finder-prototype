@@ -19,48 +19,51 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
   const [isDragging, setIsDragging] = useState(false);
 
   const bind = useDrag(
-    ({ movement: [x, y], last, distance: [dx, dy], velocity: [vx, vy] }) => {
-      // Update position while dragging
-      if (!last) {
+    ({ active, movement: [x, y], last, distance, velocity }) => {
+      const totalVelocity = Array.isArray(velocity) ? Math.sqrt(velocity[0] ** 2 + velocity[1] ** 2) : 0;
+      
+      if (active && !last) {
         controls.start({
           x,
           y,
-          rotateZ: x * 0.1, // Add a little rotation while dragging
+          rotateZ: x * 0.1,
           transition: { duration: 0 }
         });
       }
 
-      // Check if we should trigger a swipe
-      const shouldSwipe = Math.abs(x) > 100 || Math.abs(y) > 100 || Math.abs(dx) > 100 || Math.abs(dy) > 100 || Math.abs(vx) > 0.5 || Math.abs(vy) > 0.5;
+      const swipeThreshold = 100;
+      const velocityThreshold = 0.2;
+      const shouldSwipe = Math.abs(x) > swipeThreshold || 
+                         Math.abs(y) > swipeThreshold || 
+                         totalVelocity > velocityThreshold;
 
-      if (!isDragging && last && shouldSwipe) {
-        setIsDragging(true);
-        const direction = Math.abs(x) > Math.abs(y)
-          ? x > 0
-            ? 'right'
-            : 'left'
-          : y > 0
-          ? 'down'
-          : 'up';
+      if (last) {
+        if (shouldSwipe && !isDragging) {
+          setIsDragging(true);
+          const direction = Math.abs(x) > Math.abs(y)
+            ? x > 0 ? 'right' : 'left'
+            : y > 0 ? 'down' : 'up';
 
-        setExitX(x);
-        setExitY(y);
-        onSwipe(direction as 'left' | 'right' | 'up' | 'down', student);
-      } else if (last) {
-        // Reset position if not swiped
-        controls.start({
-          x: 0,
-          y: 0,
-          rotateZ: 0,
-          transition: { type: 'spring', stiffness: 300, damping: 20 }
-        });
+          setExitX(x);
+          setExitY(y);
+          onSwipe(direction as 'left' | 'right' | 'up' | 'down', student);
+        } else {
+          controls.start({
+            x: 0,
+            y: 0,
+            rotateZ: 0,
+            transition: { type: 'spring', stiffness: 300, damping: 20 }
+          });
+        }
       }
     },
     {
       enabled: isActive,
       preventScroll: true,
       filterTaps: true,
-      threshold: 5 // Small threshold to prevent accidental swipes
+      threshold: 5,
+      pointer: { touch: true, mouse: true }, // Explicitly enable both touch and mouse
+      window: typeof window !== 'undefined' ? window : undefined // Ensure window is defined
     }
   );
 
@@ -73,8 +76,8 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
   }, [isActive, controls]);
 
   return (
-    // @ts-expect-error - use-gesture and framer-motion type mismatch
     <motion.div
+      // @ts-expect-error - use-gesture and framer-motion type mismatch
       {...bind()}
       animate={controls}
       initial={{ scale: 1 }}
@@ -84,12 +87,14 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
         opacity: 0,
         transition: { duration: 0.2 }
       }}
+      drag={false} // Disable framer-motion's built-in drag
       className="absolute w-[300px] h-[400px] bg-white rounded-2xl shadow-xl p-6 cursor-grab active:cursor-grabbing touch-none"
-      style={{ 
+      style={{
         touchAction: 'none',
         WebkitTouchCallout: 'none',
         WebkitUserSelect: 'none',
         userSelect: 'none',
+        WebkitTapHighlightColor: 'transparent',
         zIndex: isActive ? 10 : 0,
         transform: isActive ? 'scale(1)' : 'scale(0.95) translateY(10px)',
         opacity: isActive ? 1 : 0.8,
