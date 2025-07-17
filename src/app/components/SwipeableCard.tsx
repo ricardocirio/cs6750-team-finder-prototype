@@ -109,7 +109,7 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
         opacity: 0,
         transition: { duration: 0.2 }
       }}
-      className="absolute w-[300px] h-[400px] bg-white rounded-2xl shadow-xl p-6 cursor-grab active:cursor-grabbing touch-none mt-32"
+      className="absolute w-[300px] h-[400px] bg-white rounded-2xl shadow-xl p-6 cursor-grab active:cursor-grabbing touch-none mt-16"
       style={{
         touchAction: 'none',
         WebkitTouchCallout: 'none',
