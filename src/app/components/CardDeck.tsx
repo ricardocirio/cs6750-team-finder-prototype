@@ -65,7 +65,7 @@ export default function CardDeck() {
     switch (direction) {
       case 'right':
         setSavedCards((prev) => [...prev, student]);
-        toast((t) => (
+        toast(() => (
           <div className="flex items-center gap-2">
             <span className="text-green-600">✨ Added {student.name} to Possible Partners</span>
           </div>

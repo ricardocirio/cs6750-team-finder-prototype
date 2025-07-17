@@ -1,8 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { motion, useAnimation, PanInfo } from 'framer-motion';
+import { motion, useAnimation } from 'framer-motion';
 import { useDrag } from '@use-gesture/react';
-import type { UserHandlers } from '@use-gesture/core/types';
 
 import { Student } from '../types';
 
@@ -20,8 +19,7 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
   const [isDragging, setIsDragging] = useState(false);
 
   const bind = useDrag(
-    ({ movement: [x, y], velocity: [vx, vy], last }) => {
-      const velocity = Math.sqrt(vx * vx + vy * vy);
+    ({ movement: [x, y], last }) => {
       const shouldSwipe = Math.abs(x) > 100 || Math.abs(y) > 100;
 
       if (!isDragging && last && shouldSwipe) {
@@ -61,10 +59,7 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
 
   return (
     <motion.div
-      onPointerDown={bindProps.onPointerDown}
-      onPointerMove={bindProps.onPointerMove}
-      onPointerUp={bindProps.onPointerUp}
-      style={{ touchAction: 'none' }}
+      {...(bind() as any)}
       animate={controls}
       initial={{ scale: 1 }}
       exit={{
@@ -73,7 +68,7 @@ export default function SwipeableCard({ student, onSwipe, isActive }: SwipeableC
         opacity: 0,
         transition: { duration: 0.2 }
       }}
-      className="absolute w-[300px] h-[400px] bg-white rounded-2xl shadow-xl p-6 cursor-grab active:cursor-grabbing"
+      className="absolute w-[300px] h-[400px] bg-white rounded-2xl shadow-xl p-6 cursor-grab active:cursor-grabbing touch-none"
       style={{ 
         touchAction: 'none',
         zIndex: isActive ? 10 : 0,
